@@ -2,8 +2,8 @@ FROM bde2020/spark-submit:2.4.0-hadoop2.7
 
 #FROM bde2020/spark-python-template:2.4.0-hadoop2.7
 
-COPY ../scripts/template.sh /
-COPY ../scripts/submit.sh /
+COPY ./scripts/template.sh /
+COPY ./scripts/submit.sh /
 
 # Path to the script or zip file
 ENV SPARK_APPLICATION_PYTHON_LOCATION /app/readwrite.py
@@ -13,6 +13,6 @@ ENV SPARK_APPLICATION_ARGS ""
 
 
 # Copy the source code
-COPY . /app
+COPY ./app /app
 
 CMD ["/bin/bash", "/template.sh"]

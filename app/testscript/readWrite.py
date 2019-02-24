@@ -1,10 +1,17 @@
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder.appName("SimpleApp").getOrCreate()
+#from pyspark import SparkContext, SparkConf
+#conf = SparkConf().setAppName("SimpleApp").setMaster("spark://spark-master:7077")
+#spark = SparkContext(conf=conf)
 
-datafile = "user/root/spark_ml/AdultCensusIncome.csv"
+spark = SparkSession.builder.appName("SimpleApp").master("spark://spark-master:7077").getOrCreate()
+
+datafile = "spark_ml/AdultCensusIncome.csv"
+print("Hello world !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 #Read the data to a spark data frame.
+
 data_all = spark.read.format('csv').options(header='true', inferSchema='true', ignoreLeadingWhiteSpace='true', ignoreTrailingWhiteSpace='true').load(datafile)
+
 print("Number of rows: {},  Number of coulumns : {}".format(data_all.count(), len(data_all.columns)))
 
 #Replace "-" with "_" in column names
@@ -31,8 +38,8 @@ train, test = data.randomSplit([0.75, 0.25], seed=123)
 print("train ({}, {})".format(train.count(), len(train.columns)))
 print("test ({}, {})".format(test.count(), len(test.columns)))
 
-train_data_path = "user/root/spark_ml/AdultCensusIncomeTrain"
-test_data_path = "user/root/spark_ml/AdultCensusIncomeTest"
+train_data_path = "spark_ml/AdultCensusIncomeTrain"
+test_data_path = "spark_ml/AdultCensusIncomeTest"
 
 train.write.mode('overwrite').orc(train_data_path)
 test.write.mode('overwrite').orc(test_data_path)
