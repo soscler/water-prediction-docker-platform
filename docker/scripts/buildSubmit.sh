@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-export SUBMIT_IMAGE_NAME=submit-example 
+export SUBMIT_IMAGE_NAME=submit
 export DOCKER_FILE_PATH=../submit/
 export SCRIPTS_FOLDER=./
 export APP_FOLDER=../../app

@@ -1,5 +1,5 @@
 
-## Some commands
+## Some useful commands
 
 ### Run a command inside a container
 
