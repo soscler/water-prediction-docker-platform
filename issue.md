@@ -1,6 +1,7 @@
 # Issues logs
 
 #### Issue #01
+#### Status: Resolved
 
 Desc: connection between hdfs and spark
 
