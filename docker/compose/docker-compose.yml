@@ -12,6 +12,10 @@ services:
     ports:
       - 50070:50070
       - 8020:8020
+    networks: 
+      - hadoop
+
+
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
     depends_on: 
@@ -22,6 +26,13 @@ services:
       - ./hadoop.env
     ports:
       - 50075:50075
+    networks: 
+      - hadoop
+    depends_on: 
+      - namenode
+    
+    
+  
   spark-master:
     image: bde2020/spark-master:2.4.0-hadoop2.7
     container_name: spark-master
@@ -30,6 +41,12 @@ services:
       - 7077:7077
     env_file:
       - ./hadoop.env
+    environment: 
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    networks: 
+      - hadoop
+
+
   spark-worker:
     image: bde2020/spark-worker:2.4.0-hadoop2.7
     depends_on:
@@ -40,6 +57,36 @@ services:
       - 8081:8081
     env_file:
       - ./hadoop.env
+    networks: 
+      - hadoop
+
+  resourcemanager:
+    image: uhopper/hadoop-resourcemanager
+    # hostname: resourcemanager
+    container_name: resourcemanager
+    # donmainname: hadoop
+    networks:
+      - hadoop
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8030:8030
+      - 8031:8031
+      - 8032:8032
+  
+  nodemanager:
+    image: uhopper/hadoop-nodemanager
+    # hostname: nodemanager
+    container_name: nodemanager
+    # donmainname: hadoop
+    networks:
+      - hadoop
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8088:8088
+      - 8040:8030
+
   spark-notebook:
     image: bde2020/spark-notebook:2.1.0-hadoop2.8-hive
     container_name: spark-notebook
@@ -47,9 +94,17 @@ services:
       - ./hadoop.env
     ports:
       - 9001:9001
+    networks: 
+      - hadoop
+
   hue:
     image: bde2020/hdfs-filebrowser:3.11
     ports:
-      - 8088:8088
+      - 8090:8088
     environment:
       - NAMENODE_HOST=namenode
+    networks: 
+      - hadoop
+
+networks: 
+  hadoop:
