@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 
 services:
@@ -15,7 +15,7 @@ services:
       - 50070:50070
       - 8020:8020
     networks: 
-      - scac-network-2019
+      - scac-network
 
 
   datanode:
@@ -29,7 +29,7 @@ services:
     ports:
       - 50075:50075
     networks: 
-      - scac-network-2019
+      - scac-network
     depends_on: 
       - namenode
 
@@ -40,4 +40,4 @@ volumes:
 
 
 networks:
-  scac-network-2019:
+  scac-network:

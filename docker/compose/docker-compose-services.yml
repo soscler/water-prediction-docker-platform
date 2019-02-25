@@ -1,7 +1,7 @@
-version: '3'
+version: '3.5'
 
 services:
-    resourcemanager:
+  resourcemanager:
     image: uhopper/hadoop-resourcemanager
     # hostname: resourcemanager
     container_name: resourcemanager
@@ -47,5 +47,7 @@ services:
     networks: 
       - scac-network-2019
 
-networks: 
+networks:
   scac-network-2019:
+    external: true
+    name: scac-network-2019
