@@ -1,0 +1,43 @@
+version: '3'
+
+
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    container_name: namenode
+    volumes:
+      - namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=scac-cluster-2019
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 50070:50070
+      - 8020:8020
+    networks: 
+      - scac-network-2019
+
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    depends_on: 
+      - namenode
+    volumes:
+      - datanode:/hadoop/dfs/data
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 50075:50075
+    networks: 
+      - scac-network-2019
+    depends_on: 
+      - namenode
+
+
+volumes:
+  datanode:
+  namenode:
+
+
+networks:
+  scac-network-2019:

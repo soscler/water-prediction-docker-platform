@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+    resourcemanager:
+    image: uhopper/hadoop-resourcemanager
+    # hostname: resourcemanager
+    container_name: resourcemanager
+    # donmainname: hadoop
+    networks: 
+      - scac-network-2019
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8030:8030
+      - 8031:8031
+      - 8032:8032
+  
+  nodemanager:
+    image: uhopper/hadoop-nodemanager
+    # hostname: nodemanager
+    container_name: nodemanager
+    # donmainname: hadoop
+    networks: 
+      - scac-network-2019
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8088:8088
+      - 8040:8030
+
+  spark-notebook:
+    image: bde2020/spark-notebook:2.1.0-hadoop2.8-hive
+    container_name: spark-notebook
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 9001:9001
+    networks: 
+      - scac-network-2019
+
+  hue:
+    image: bde2020/hdfs-filebrowser:3.11
+    ports:
+      - 8090:8088
+    environment:
+      - NAMENODE_HOST=namenode
+    networks: 
+      - scac-network-2019
+
+networks: 
+  scac-network-2019:
