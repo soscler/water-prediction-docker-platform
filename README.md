@@ -32,6 +32,8 @@ This project is about building a platform for scalable computing
 
 ## Build the project
 ### Local:
+### Still in development !!!!!
+### We provide a makefile located in the /docker/compose
 - First run the docker-compose file located in /docker/compose
 - your app files must be located in the directory app
 - build your submit image by running ./buildSubmit.sh located in /docker/scripts
