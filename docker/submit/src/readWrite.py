@@ -10,7 +10,7 @@ print("Hello world !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 spark = SparkSession.builder.appName("SimpleApp").master("spark://spark-master:7077").getOrCreate()
 
-datafile = "/app/spark_ml/AdultCensusIncome.csv"
+datafile = "hdfs://namenode:8020/app/spark_ml/AdultCensusIncome.csv"
 #Read the data to a spark data frame.
 
 data_all = spark.read.format('csv').options(header='true', inferSchema='true', ignoreLeadingWhiteSpace='true', ignoreTrailingWhiteSpace='true').load(datafile)
@@ -41,8 +41,8 @@ train, test = data.randomSplit([0.75, 0.25], seed=123)
 print("train ({}, {})".format(train.count(), len(train.columns)))
 print("test ({}, {})".format(test.count(), len(test.columns)))
 
-train_data_path = "/app/spark_ml/AdultCensusIncomeTrain"
-test_data_path = "/app/spark_ml/AdultCensusIncomeTest"
+train_data_path = "hdfs://namenode:8020/app/spark_ml/AdultCensusIncomeTrain"
+test_data_path = "hdfs://namenode:8020/app/spark_ml/AdultCensusIncomeTest"
 
 train.write.mode('overwrite').orc(train_data_path)
 test.write.mode('overwrite').orc(test_data_path)

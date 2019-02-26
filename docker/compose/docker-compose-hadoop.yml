@@ -41,3 +41,5 @@ volumes:
 
 networks:
   scac-network:
+    external: true
+    name: scac-network-2019

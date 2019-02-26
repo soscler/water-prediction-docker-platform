@@ -9,11 +9,12 @@ services:
       - CLUSTER_NAME=test
     env_file:
       - ./hadoop.env
+    networks: 
+      - hadoop
     ports:
       - 50070:50070
       - 8020:8020
-    networks: 
-      - hadoop
+    
 
 
   datanode:
@@ -24,10 +25,10 @@ services:
       - ../volumes/datanode:/hadoop/dfs/data
     env_file:
       - ./hadoop.env
-    ports:
-      - 50075:50075
     networks: 
       - hadoop
+    ports:
+      - 50075:50075
     depends_on: 
       - namenode
     
@@ -53,12 +54,12 @@ services:
       - spark-master
     environment:
       - SPARK_MASTER=spark://spark-master:7077
+    networks: 
+      - hadoop
     ports:
       - 8081:8081
     env_file:
       - ./hadoop.env
-    networks: 
-      - hadoop
 
   resourcemanager:
     image: uhopper/hadoop-resourcemanager

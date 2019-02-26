@@ -5,6 +5,7 @@ all:
 	make hadoop
 	make spark
 	make services
+	web
 
 network:
 	docker network create scac-network-2019
@@ -21,7 +22,7 @@ spark:
 	docker-compose -f docker-compose-spark.yml up -d
 
 services:
-	docker-compose -f docker-compose-services.yml services up -d
+	docker-compose -f docker-compose-services.yml up -d
 
 web:
 	docker-compose -f docker-compose-web.yml
