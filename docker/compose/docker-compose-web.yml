@@ -1,0 +1,46 @@
+version: '3.5'
+
+services:
+  cassandra:
+    image: cassandra:2.2.0
+    container_name: cassandra-results
+    volumes: 
+      - ./data/cassandra-results:/weatherwater
+    networks: 
+      - scac-network-2019
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra
+      
+
+  simple_ui:
+    image: anostdev/scac-client:0.0.1
+    container_name: simple_ui
+    networks: 
+      - scac-network-2019
+    ports:
+      - "5000:5000"
+    depends_on:
+      - cassandra
+    environment:
+      - CASSANDRA_PORT_9042_TCP_ADDR=cassandra
+      - CASSANDRA_PORT_9042_TCP_PORT= 9042
+    #command: 'python -u app.py'
+
+
+  start_dependencies:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - cassandra
+    command: cassandra:9042
+    environment:
+      - SLEEP_LENGTH= 1
+      - TIMEOUT_LENGTH=100
+    networks: 
+      - scac-network-2019
+
+networks:
+  scac-network-2019:
+    external: true
+    name: scac-network-2019
