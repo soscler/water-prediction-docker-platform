@@ -1,6 +1,7 @@
 
 
 all:
+	make clean
 	make network
 	make hadoop
 	make spark
@@ -38,9 +39,9 @@ stop:
 #make stop && 	# && docker network rm scac-network-2019 && docker volumes rm datanode namenode
 
 clean:
-	make stop
-	docker rm $(docker ps -aq)
-	docker network rm scac-network-2019
-	docker volume rm datanode namenode
+	-make stop
+	-docker rm $(docker ps -aq)
+	-docker network rm scac-network-2019
+	-docker volume rm datanode namenode
 
 
