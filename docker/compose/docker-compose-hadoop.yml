@@ -3,7 +3,7 @@ version: '3.5'
 
 services:
   namenode:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    image: anostdev/hadoop-master:1.0.0-hadoop2.7.7
     container_name: namenode
     volumes:
       - namenode:/hadoop/dfs/name
@@ -19,7 +19,7 @@ services:
 
 
   datanode:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    image: anostdev/hadoop-worker:1.0.0-hadoop2.7.7
     depends_on: 
       - namenode
     volumes:
