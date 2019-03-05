@@ -1,5 +1,3 @@
-
-
 all:
 	make clean
 	make network
