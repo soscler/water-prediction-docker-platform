@@ -1,15 +1,15 @@
 version: '3.5'
 
 services:
-  spark-notebook:
-    image: bde2020/spark-notebook:2.1.0-hadoop2.8-hive
-    container_name: spark-notebook
-    env_file:
-      - ./hadoop.env
-    ports:
-      - 9001:9001
-    networks: 
-      - scac-network-2019
+  #spark-notebook:
+    #image: bde2020/spark-notebook:2.1.0-hadoop2.8-hive
+    #container_name: spark-notebook
+    #env_file:
+      #- ./hadoop.env
+    #ports:
+      #- 9001:9001
+    #networks: 
+      #- scac-network-2019
 
   hue:
     image: bde2020/hdfs-filebrowser:3.11
