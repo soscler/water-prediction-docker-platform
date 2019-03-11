@@ -1,5 +1,3 @@
-
-
 all:
 	-make network
 	make hadoop
@@ -34,7 +32,6 @@ stop:
 	docker-compose -f docker-compose-spark.yml down
 	docker-compose -f docker-compose-services.yml down
 	docker-compose -f docker-compose-web.yml down
-
 # Delete all the services volumes and networks
 #make stop && 	# && docker network rm scac-network-2019 && docker volumes rm datanode namenode
 

@@ -15,7 +15,7 @@ services:
       
 
   simple_ui:
-    image: anostdev/scac-client:0.0.1
+    image: flaskapp
     container_name: simple_ui
     networks: 
       - scac-network-2019

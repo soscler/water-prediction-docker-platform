@@ -17,5 +17,5 @@ ENV SPARK_APPLICATION_ARGS ""
 # Copy the source code
 COPY . .
 COPY ./src/water.py .
-#CMD ["/bin/bash"]
+# CMD ["/bin/bash"]
 CMD ["/bin/bash", "/template.sh"]
