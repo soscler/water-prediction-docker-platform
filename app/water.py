@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.ml.regression import LinearRegression,GeneralizedLinearRegression,DecisionTreeRegressor
+from pyspark.ml.regression import DecisionTreeRegressor
 from pyspark.ml.feature import VectorAssembler
 from pyspark.sql.functions import *
 
@@ -8,7 +8,7 @@ sc = SparkSession \
     .builder \
     .master("spark://spark-master:7077") \
     .config("spark.cassandra.connection.host", "cassandra") \
-    .config("spark.executor.memory", "1000m")\
+    .config("spark.executor.memory", "2000m")\
     .appName("Weather prediction") \
     .getOrCreate()
 rawdata = sc.read.load(filename, format="csv", sep=",", inferSchema="true", header="true")
@@ -21,7 +21,7 @@ data = sc.read.orc("hdfs://namenode:8020/spark_ml/Weather")
 #select features to be used
 dataset = data.sort(asc('ID')).select("ID","YYYYMMDD","HH", "DD","FH","T","SQ","P","VV","U","Gallons")
 count = dataset.count()
-training = dataset.limit(int(count *0.9))  # split by 0.85
+training = dataset.limit(int(count *0.9))
 testing = dataset.subtract(training)
 
 assembler = VectorAssembler(inputCols=["DD","FH","T","SQ","P","VV","U"], outputCol='features')
@@ -45,8 +45,6 @@ predicitiondf = testing.select("ID","YYYYMMDD", "HH", "Gallons").join(prediction
                 .withColumnRenamed("HH", "hh")\
                 .withColumnRenamed("Gallons","gallons")\
                 .sort(asc('ID'))
-
-
 
 
 predicitiondf.write.format("org.apache.spark.sql.cassandra")\

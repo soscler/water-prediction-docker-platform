@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 #Connecting to cassandra
 cluster = Cluster([os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR')], port=int(os.environ.get('CASSANDRA_PORT_9042_TCP_PORT')))
-
+print(os.environ.get('CASSANDRA_PORT_9042_TCP_ADDR'))
 session = cluster.connect()
 
 # Init the database
@@ -16,14 +16,7 @@ session.execute("""
         WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' }
         """ % KEYSPACE)
 session.set_keyspace(KEYSPACE)
-# session.execute("""
-#         CREATE TABLE IF NOT EXISTS tempgallons (
-#             temp_id bigint,
-#             temp bigint,
-#             gallons bigint,
-#             PRIMARY KEY (temp_id)
-#         )
-#         """)
+
 session.execute("""
         CREATE TABLE IF NOT EXISTS testpredictions (
             id bigint,
@@ -31,10 +24,9 @@ session.execute("""
             hh bigint,
             gallons float,
             prediction float,
-            PRIMARY KEY (id,yyyymmdd)
+            PRIMARY KEY (yyyymmdd,id)
         )
-        """)        
-# session.execute(""" INSERT INTO testpredictions (id, year, hour , gallons, predicted_gallons) VALUES(uuid(),20190308,05,1.45, 0.96) """)        
+        """)              
 
 
 @app.route("/")
