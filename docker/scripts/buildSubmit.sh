@@ -18,4 +18,4 @@ echo "About to build the image ${IMAGE_NAME}..."
 docker build ${DOCKER_FILE_PATH} -t ${SUBMIT_IMAGE_NAME}
 echo "Removing unecessary files..."
 rm -rf ${DOCKER_FILE_PATH}/scripts/
-#rm -rf ${DOCKER_FILE_PATH}/src
+rm -rf ${DOCKER_FILE_PATH}/src

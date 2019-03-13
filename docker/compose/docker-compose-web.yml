@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   cassandra:
-    image: cassandra:2.2.0
+    image: cassandra:3.11
     container_name: cassandra-results
     volumes: 
       - ./data/cassandra-results:/weatherwater
@@ -15,7 +15,7 @@ services:
       
 
   simple_ui:
-    image: anostdev/scac-client:0.0.1
+    image: flaskapp
     container_name: simple_ui
     networks: 
       - scac-network-2019
@@ -29,16 +29,16 @@ services:
     #command: 'python -u app.py'
 
 
-  start_dependencies:
-    image: dadarek/wait-for-dependencies
-    depends_on:
-      - cassandra
-    command: cassandra:9042
-    environment:
-      - SLEEP_LENGTH= 1
-      - TIMEOUT_LENGTH=100
-    networks: 
-      - scac-network-2019
+  #start_dependencies:
+    #image: dadarek/wait-for-dependencies
+    #depends_on:
+     #- cassandra
+    #command: cassandra:9042
+    #environment:
+      #- SLEEP_LENGTH= 1
+      #- TIMEOUT_LENGTH=100
+    #networks: 
+      #- scac-network-2019
 
 networks:
   scac-network-2019:

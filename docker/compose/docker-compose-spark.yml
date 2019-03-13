@@ -3,7 +3,7 @@ version: '3.5'
 services:
 
   spark-master:
-    image: bde2020/spark-master:2.4.0-hadoop2.7
+    image: anostdev/spark-master:1.0.0-hadoop2.7.7
     container_name: spark-master
     ports:
       - 8080:8080
@@ -15,17 +15,30 @@ services:
 
 
   spark-worker:
-    image: bde2020/spark-worker:2.4.0-hadoop2.7
+    image:  anostdev/spark-worker:1.0.0-hadoop2.7
     depends_on:
       - spark-master
     environment:
       - SPARK_MASTER=spark://spark-master:7077
     ports:
-      - 8081:8081
+      - 8081:8080
     env_file:
       - ./hadoop.env
     networks: 
       - scac-network-2019
+  
+  spark-worker-2:
+    image: anostdev/spark-worker:1.0.2-hadoop2.7
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    networks: 
+      - scac-network-2019
+    ports:
+      - 8082:8080
+    env_file:
+      - ./hadoop.env
 
 networks:
   scac-network-2019:

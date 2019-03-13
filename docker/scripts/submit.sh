@@ -22,6 +22,9 @@ else
         PYSPARK_PYTHON=python3 /spark/bin/spark-submit \
             --master ${SPARK_MASTER_URL} \
             ${SPARK_SUBMIT_ARGS} \
+            --conf spark.cassandra.connection.host=cassandra \
+            --packages datastax:spark-cassandra-connector:2.4.0-s_2.11 \
+            --repositories https://dl.bintray.com/spark-packages/maven/ \
             ${SPARK_APPLICATION_PYTHON_LOCATION} ${SPARK_APPLICATION_ARGS}
     else
         echo "Not recognized application."
