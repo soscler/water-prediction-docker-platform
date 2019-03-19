@@ -1,9 +1,18 @@
 package com.scac.server.stream.model;
 
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
+import com.scac.server.stream.utils.CsvReader;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class Data {
+    private Map<String, String> map;
+
+    public Data(){
+        map = new HashMap<String, String>();
+    }
+
+
 }
