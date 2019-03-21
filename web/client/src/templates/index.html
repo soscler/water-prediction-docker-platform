@@ -7,9 +7,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css">
     <script src="main.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script
+        src="http://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1>HEY THERE</h1>
-    <h3>{{msg}}</h3>
+    
+    <canvas id="myLineChart" height="150px" width="300px"></canvas>
+    
+   
+<!--     
+    <table>
+            <tr>
+                    <th>Year</th>
+                    <th>Hour</th>
+                    <th>Gallons</th>
+                    <th>Predictions</th>
+            </tr>
+        {% for row in msg %}               
+            <tr>
+                <td> {{ row.year }} </td>
+                <td> {{ row.Time }} </td>
+                <td> {{ row.Gallons }} </td>
+                <td> {{ row.predicted_gallons }} </td>
+            </tr>
+         {% endfor %}
+    </table> -->
 </body>
+   <script>
+      var rawfile = '{{ msg }}';
+      var jsonfile = JSON.parse(rawfile.replace(/&#39;/g,'"'))
+      jsonfile.sort((a, b) => Number(a.id) - Number(b.id));
+      console.log(jsonfile);
+
+      var labels = jsonfile.map(function(e) {
+         return e.year;
+      });
+      var data = jsonfile.map(function(e) {
+         return e.predicted_gallons;
+      });;
+
+      var ctx = myLineChart.getContext('2d');
+      var config = {
+         type: 'line',
+         data: {
+            labels: labels,
+            datasets: [{
+               label: 'Water usage prediction',
+               data: data,
+               backgroundColor: 'rgba(0, 119, 204, 0.3)',
+               fill:false
+            }]
+         }
+      };
+
+      var chart = new Chart(ctx, config);
+   </script>
 </html>

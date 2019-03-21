@@ -18,5 +18,4 @@ RUN pip install --trusted-host pypi.python.org -r requirements.txt
 EXPOSE 5000
 
 # Run app.py and create.py when the container launches
-#CMD ["/bin/bash"]
-CMD ["./wait-for-it.sh", " cassandra:9042 -t 10","--", "python", "./src/app.py"]
+CMD ["./wait-for-it.sh", "cassandra:9042 -t 10 ","--","python", "./src/app.py"]
