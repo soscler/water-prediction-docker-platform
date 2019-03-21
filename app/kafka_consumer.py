@@ -12,6 +12,8 @@ def kafkaConsumer():
     
     # Defining Kafka Consumer
     kafkaStream = KafkaUtils.createDirectStream(ssc, 'cdh57-01-node-01.moffatt.me:2181', 'spark-streaming2', {'twitter':1})
+
+    
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: direct_kafka_wordcount.py <broker_list> <topic>", file=sys.stderr)
