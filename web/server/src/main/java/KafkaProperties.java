@@ -20,7 +20,9 @@ public class KafkaProperties {
     public static final String KAFKA_SERVER_URL = "localhost";
     public static final int KAFKA_SERVER_PORT = 9092;
     public static final long CSV_READER_TIMER = 1000;
-    public static final String CSV_FILE = "D:\\professional\\coding\\big-data\\kafka\\src\\main\\resources\\data.csv";
+    public static final String CSV_FILE_NAME = "data.csv";
+    public static final String URL = "https://raw.githubusercontent.com/Jarvin-M/Coding-Practice/master/Weatherwater.csv";
+
     public static final int KAFKA_PRODUCER_BUFFER_SIZE = 64 * 1024;
     public static final int CONNECTION_TIMEOUT = 100000;
     public static final String TOPIC2 = "topic2";

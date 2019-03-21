@@ -15,17 +15,26 @@
  * limitations under the License.
  */
 
+import java.io.IOException;
+
 public class KafkaConsumerProducerDemo {
     public static void main(String[] args) {
         System.out.println("About to start kafka demo");
         boolean isAsync = args.length == 0 || !args[0].trim().equalsIgnoreCase("sync");
-        DataGenerator dataGenerator = new DataGenerator(KafkaProperties.CSV_FILE, KafkaProperties.CSV_READER_TIMER);
 
-        Producer producerThread = new Producer(KafkaProperties.TOPIC, isAsync, dataGenerator);
-        producerThread.start();
+        FileDownloader fd = new FileDownloader(KafkaProperties.URL, KafkaProperties.CSV_FILE_NAME);
+        try{
+            fd.download();
+            DataGenerator dataGenerator = new DataGenerator(KafkaProperties.CSV_FILE_NAME, KafkaProperties.CSV_READER_TIMER);
 
-        Consumer consumerThread = new Consumer(KafkaProperties.TOPIC);
-        consumerThread.start();
+            Producer producerThread = new Producer(KafkaProperties.TOPIC, isAsync, dataGenerator);
+            producerThread.start();
+
+            Consumer consumerThread = new Consumer(KafkaProperties.TOPIC);
+            consumerThread.start();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
 
     }
 }
