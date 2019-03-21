@@ -1,6 +1,7 @@
 from flask import Flask,render_template,url_for,jsonify
 from cassandra.cluster import Cluster
 import os
+import datetime
 
 KEYSPACE = "weatherwater"
 app = Flask(__name__)
@@ -31,20 +32,19 @@ session.execute("""
 
 @app.route("/")
 def post_to_front():
-    rows = session.execute('SELECT * FROM testpredictions')
+    rows = session.execute('SELECT id,yyyymmdd,MAX(prediction) as prediction,hh FROM testpredictions GROUP BY yyyymmdd;')
     pulled =[]
     for row in rows:
         print(row)
         each_row ={
             'id':row.id,
-            'Time': row.hh,
-            'year':row.yyyymmdd,
-            'Gallons': row.gallons,
-            'predicted_gallons': row.prediction
+            'Time':row.hh,
+            'year':row.yyyymmdd.strftime("%m/%d/%Y"),
+            'predicted_gallons':row.prediction
         }
         pulled.append(each_row)
     # msg=jsonify({'result': pulled})
     return render_template("index.html",msg=pulled)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int("5000"))
+    app.run(debug=True, host='localhost', port=int("5000"))
