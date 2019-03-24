@@ -30,8 +30,8 @@ public class KafkaConsumerProducerDemo {
             Producer producerThread = new Producer(KafkaProperties.TOPIC, isAsync, dataGenerator);
             producerThread.start();
 
-            Consumer consumerThread = new Consumer(KafkaProperties.TOPIC);
-            consumerThread.start();
+            /*Consumer consumerThread = new Consumer(KafkaProperties.TOPIC);
+            consumerThread.start();*/
         } catch (IOException e){
             e.printStackTrace();
         }

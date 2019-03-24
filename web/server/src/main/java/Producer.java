@@ -52,7 +52,7 @@ public class Producer extends Thread {
 
     public void run() {
         int messageNo = 1;
-
+        producer.flush();
 
         while (true) {
 

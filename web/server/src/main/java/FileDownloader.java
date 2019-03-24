@@ -12,8 +12,8 @@ public class FileDownloader {
 
     public FileDownloader(String url, String filepath){
         this.url = url;
-        Path file = Paths.get("../resources").toAbsolutePath();
-        this.filepath = file.toAbsolutePath().toString() + File.pathSeparator +  filepath;
+        Path file = Paths.get("../resources/").toAbsolutePath();
+        this.filepath = filepath;
         System.out.println("*** " + filepath);
     }
 

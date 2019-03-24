@@ -41,7 +41,7 @@ public class Consumer extends ShutdownableThread {
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.IntegerDeserializer");
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "none");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
 
         consumer = new KafkaConsumer<>(props);

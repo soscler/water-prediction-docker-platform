@@ -28,7 +28,7 @@ services:
       - scac-network-2019
   
   spark-worker-2:
-    image: anostdev/spark-worker:1.0.2-hadoop2.7
+    image: anostdev/spark-worker:1.0.0-hadoop2.7
     depends_on:
       - spark-master
     environment:
