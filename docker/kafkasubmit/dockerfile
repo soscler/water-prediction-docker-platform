@@ -1,0 +1,21 @@
+FROM anostdev/spark-base:1.0.0-hadoop2.7
+
+#FROM bde2020/spark-python-template:2.4.0-hadoop2.7
+
+#WORKDIR /app
+
+COPY ./scripts/kafkatemplate.sh /
+COPY ./scripts/kafkasubmit.sh /
+
+# Path to the script or zip file
+ENV SPARK_APPLICATION_PYTHON_LOCATION=kafka_consumer.py
+ENV CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+# Argument for the program
+ENV SPARK_APPLICATION_ARGS ""
+
+
+# Copy the source code
+COPY . .
+COPY ./src/kafka_consumer.py .
+# CMD ["/bin/bash"]
+CMD ["/bin/bash", "/kafkatemplate.sh"]
