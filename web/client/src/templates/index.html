@@ -48,7 +48,10 @@
       });
       var data = jsonfile.map(function(e) {
          return e.predicted_gallons;
-      });;
+      });
+       var temperature = jsonfile.map(function(e){
+         return e.temperature
+      });
 
       var ctx = myLineChart.getContext('2d');
       var config = {
@@ -59,8 +62,14 @@
                label: 'Water usage prediction',
                data: data,
                backgroundColor: 'rgba(0, 119, 204, 0.3)',
-               fill:false
-            }]
+               fill:true
+            },
+             {
+               label:"Temperature",
+               data:temperature,
+               backgroundColor: "rgba(225,0,0,0.4)",
+               fill:false}
+            ]
          }
       };
 

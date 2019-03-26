@@ -55,11 +55,12 @@ def testing_prediction(testSet, model):
     testingData = feature_assembler().transform(testSet)
     predictions = model.transform(testingData).select("ID","YYYYMMDD", "HH","prediction")
 
-    predicition_df = testSet.select("ID","YYYYMMDD", "HH", "Gallons").join(predictions, testSet.ID == predictions.ID, 'inner') \
+    predicition_df = testSet.select("ID","YYYYMMDD", "HH", "Gallons","T").join(predictions, testSet.ID == predictions.ID, 'inner') \
                     .drop(predictions.YYYYMMDD).drop(predictions.ID).drop(predictions.HH)\
                     .withColumnRenamed("ID","id")\
                     .withColumnRenamed("YYYYMMDD","yyyymmdd")\
                     .withColumnRenamed("HH", "hh")\
+                    .withColumnRenamed("T", "temperature")\
                     .withColumnRenamed("Gallons","gallons")\
                     .sort(asc('ID'))
     return predicition_df

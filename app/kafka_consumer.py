@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     sc = SparkContext(appName="WeatherwaterKafkaConsumer", master="spark://spark-master:7077")
     sc.setLogLevel("WARN")
-    ssc = StreamingContext(sc, 60)
+    ssc = StreamingContext(sc, 2)
 
     # brokers, topic = sys.argv[1:]
     # # Defining Kafka Consumer
