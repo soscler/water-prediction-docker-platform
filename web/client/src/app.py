@@ -30,6 +30,10 @@ session.execute("""
         )
         """)              
 
+# session.execute("""
+#     ALTER TABLE testpredictions ADD temperature float
+# """)
+
 
 @app.route("/")
 def post_to_front():

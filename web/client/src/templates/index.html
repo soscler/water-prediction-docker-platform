@@ -16,7 +16,7 @@
 </head>
 <body>
     
-    <canvas id="myLineChart" height="150px" width="300px"></canvas>
+    <canvas id="myLineChart" height="70px" width="300px"></canvas>
     
    
 <!--     
@@ -52,6 +52,7 @@
        var temperature = jsonfile.map(function(e){
          return e.temperature
       });
+      
 
       var ctx = myLineChart.getContext('2d');
       var config = {
@@ -66,9 +67,9 @@
             },
              {
                label:"Temperature",
-               data:temperature,
+               data: temperature,
                backgroundColor: "rgba(225,0,0,0.4)",
-               fill:false}
+               fill:true}
             ]
          }
       };
