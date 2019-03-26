@@ -47,4 +47,4 @@ def post_to_front():
     return render_template("index.html",msg=pulled)
 
 if __name__ == '__main__':
-    app.run(debug=False, host="localhost", port=int("5000"))
+    app.run(debug=False, host="0.0.0.0", port=int("5000"))

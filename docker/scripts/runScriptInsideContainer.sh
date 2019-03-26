@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export FILE_NAME=getWaterData.sh
+export FILE_NAME=getdata.sh
 export SCRIPT_PATH=./${FILE_NAME}
 export CONTAINER_NAME=namenode
 export DEST_PATH=/spark_ml

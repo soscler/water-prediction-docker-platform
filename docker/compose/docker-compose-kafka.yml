@@ -20,6 +20,7 @@ services:
     container_name: kafka
     ports:
       - 9092:9092
+      - 29092:29092
     networks:
       - scac-network-2019
     env_file:

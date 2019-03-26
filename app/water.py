@@ -42,11 +42,11 @@ def model_regressor(trainingSet):
     dt = DecisionTreeRegressor(labelCol="Gallons")
     model = dt.fit(trainingData)
     # saving the model 
-    # model_name = "Waterpredictor.mml"
-    # model_fs = "hdfs://namenode:8020/spark_ml/" + model_name
+    model_name = "Waterpredictor.mml"
+    model_fs = "hdfs://namenode:8020/spark_ml/" + model_name
 
-    # model.write().overwrite().save(model_fs)
-    # print("saved model to {}".format(model_fs))
+    model.write().overwrite().save(model_fs)
+    print("saved model to {}".format(model_fs))
     return model
 
 
