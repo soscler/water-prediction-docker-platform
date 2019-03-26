@@ -23,6 +23,7 @@ session.execute("""
             id bigint,
             yyyymmdd timestamp,
             hh bigint,
+            temperature float,
             gallons float,
             prediction float,
             PRIMARY KEY (yyyymmdd,id)
@@ -32,7 +33,7 @@ session.execute("""
 
 @app.route("/")
 def post_to_front():
-    rows = session.execute('SELECT id,yyyymmdd,MAX(prediction) as prediction,hh FROM testpredictions GROUP BY yyyymmdd;')
+    rows = session.execute('SELECT id,yyyymmdd,MAX(prediction) as prediction,hh,temperature FROM testpredictions GROUP BY yyyymmdd;')
     pulled =[]
     for row in rows:
         print(row)
@@ -40,7 +41,8 @@ def post_to_front():
             'id':row.id,
             'Time':row.hh,
             'year':row.yyyymmdd.strftime("%m/%d/%Y"),
-            'predicted_gallons':row.prediction
+            'predicted_gallons':row.prediction,
+            "temperature": row.temperature
         }
         pulled.append(each_row)
     # msg=jsonify({'result': pulled})
