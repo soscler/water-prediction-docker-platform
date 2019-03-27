@@ -4,6 +4,7 @@ services:
   cassandra:
     image: cassandra:3.11
     container_name: cassandra-results
+    hostname: cassandra
     volumes: 
       - ./data/cassandra-results:/weatherwater
     networks: 
@@ -12,6 +13,8 @@ services:
       - "9042:9042"
     environment:
       - CASSANDRA_BROADCAST_ADDRESS=cassandra
+      - CASSANDRA_START_RPC=true
+      
       
 
   simple_ui:
@@ -29,16 +32,16 @@ services:
     #command: 'python -u app.py'
 
 
-  #start_dependencies:
-    #image: dadarek/wait-for-dependencies
-    #depends_on:
-     #- cassandra
-    #command: cassandra:9042
-    #environment:
-      #- SLEEP_LENGTH= 1
-      #- TIMEOUT_LENGTH=100
-    #networks: 
-      #- scac-network-2019
+  # start_dependencies:
+  #   image: dadarek/wait-for-dependencies
+  #   depends_on:
+  #     - cassandra
+  #   command: cassandra:9042
+  #   environment:
+  #     - SLEEP_LENGTH= 1
+  #     - TIMEOUT_LENGTH=100
+  #   networks: 
+  #     - scac-network-2019
 
 networks:
   scac-network-2019:

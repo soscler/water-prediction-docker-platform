@@ -4,6 +4,7 @@ all:
 	make spark
 	make services
 	make web
+	make kafka
 
 network:
 	docker network create scac-network-2019
@@ -21,6 +22,9 @@ spark:
 
 services:
 	docker-compose -f docker-compose-services.yml up -d
+
+kafka:
+	docker-compose -f docker-compose-kafka.yml up -d
 
 web:
 	docker-compose -f docker-compose-web.yml up -d
