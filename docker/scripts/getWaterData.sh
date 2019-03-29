@@ -1,8 +1,9 @@
 #!/bin/bash
 
 export DATA_FOLDER_NAME=/spark_ml
-export DATA_FILE_NAME=Weatherwater.csv
-export DATA_URL=https://raw.githubusercontent.com/Jarvin-M/Coding-Practice/master/Weatherwater.csv
+export DATA_FILE_NAME=Weatherwater2.csv
+export DATA_URL=https://raw.githubusercontent.com/Jarvin-M/Coding-Practice/master/batchData.csv
+#https://raw.githubusercontent.com/Jarvin-M/Coding-Practice/master/Weatherwater.csv
 
 mkdir -p ${DATA_FOLDER_NAME}
 echo "Downloading the data set..."

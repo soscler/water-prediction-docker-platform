@@ -23,6 +23,7 @@ else
             --master ${SPARK_MASTER_URL} \
             ${SPARK_SUBMIT_ARGS} \
             --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.2.0 \
+            --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.1.0 \
             ${SPARK_APPLICATION_PYTHON_LOCATION} ${SPARK_APPLICATION_ARGS}
     else
         echo "Not recognized application."

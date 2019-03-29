@@ -1,12 +1,16 @@
 from pyspark.sql import SparkSession
+from pyspark import SparkContext
+from pyspark import SparkConf
 from pyspark.ml.regression import DecisionTreeRegressor
 from pyspark.ml.feature import VectorAssembler
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from datetime import datetime
+from pyspark.streaming import StreamingContext
+from pyspark.streaming.kafka import KafkaUtils
 
 def write_to_hdfs(spark): 
-    filename = "hdfs://namenode:8020/spark_ml/Weatherwater.csv"
+    filename = "hdfs://namenode:8020/spark_ml/Weatherwater2.csv"
     rawdata = spark.read.load(filename, format="csv", sep=",", inferSchema="true", header="true")
     rawdata.write.mode('overwrite').orc("hdfs://namenode:8020/spark_ml/Weather")
 
@@ -93,6 +97,12 @@ def evaluate_model(predicitons):
     return rmse
 
 def main():
+    # config = SparkConf()\
+    #     .setMaster("spark://spark-master:7077") \
+    #     .set("spark.cassandra.connection.host", "cassandra") \
+    #     .set("spark.executor.memory", "2000m")
+    # sc = SparkContext(appName="WeatherwaterKafkaConsumer", master="spark://spark-master:7077", conf=config) \
+    #     .getOrCreate()
     sc = SparkSession \
         .builder \
         .master("spark://spark-master:7077") \
@@ -101,18 +111,50 @@ def main():
         .appName("Weather prediction") \
         .getOrCreate()
     #1   
-    write_to_hdfs(sc)
+    #write_to_hdfs(sc)
     #2
-    trainingSet, testingSet = data_process(sc)
+    #trainingSet, testingSet = data_process(sc)
     #3
-    waterpredictor = model_regressor(trainingSet)
+    #waterpredictor = model_regressor(trainingSet)
     
     # waterpredictor = sc.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
     #4
-    predictions = testing_prediction(testingSet,waterpredictor)
+    #predictions = testing_prediction(testingSet,waterpredictor)
     #5
-    write_to_cassandra(predictions)
+    #write_to_cassandra(predictions)
     #6
+
+    # -- Kafka consumer
+
+    print("*************************************************************************************************************")
+    kafkareader = sc \
+        .readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "kafka:29092") \
+        .option("subscribe", "topic1") \
+        .option("startingOffsets", "earliest") \
+        .load()
+    # stream = kafkareader.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+    # stream.writeStream.format("console").start()
+
+
+    rawQuery = kafkareader \
+        .writeStream \
+        .queryName("qraw")\
+        .format("memory")\
+        .start()
+    raw = sc.sql("select * from qraw")
+    raw.show()
+
+    # ssc = StreamingContext(sparkContext=sc, batchDuration=1)
+
+    # streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
+    # lines = streams.map(lambda x: x[1])
+    # lines.pprint()
+    # #print(streams)
+
+    # ssc.start()
+    # ssc.awaitTermination()
     sc.stop()
 
 if __name__ == "__main__":
