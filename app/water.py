@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.ml.regression import DecisionTreeRegressor
 from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from datetime import datetime
@@ -44,11 +45,11 @@ def model_regressor(trainingSet):
     dt = DecisionTreeRegressor(labelCol="Gallons")
     model = dt.fit(trainingData)
     # saving the model 
-    # model_name = "Waterpredictor.mml"
-    # model_fs = "hdfs://namenode:8020/spark_ml/" + model_name
+    model_name = "Waterpredictor.mml"
+    model_fs = "hdfs://namenode:8020/spark_ml/" + model_name
 
-    # model.write().overwrite().save(model_fs)
-    # print("saved model to {}".format(model_fs))
+    model.write().overwrite().save(model_fs)
+    print("saved model to {}".format(model_fs))
     return model
 
 
@@ -77,14 +78,15 @@ def write_to_cassandra(predictions):
         .save()
     return "Cassandra Success"
 
-def evaluate_model(predicitons):
-    evaluator = RegressionEvaluator(labelCol="label", predictionCol="prediction", metricName="rmse")
+def evaluate_model(spark,predictions):
+    evaluator = RegressionEvaluator(labelCol="gallons", predictionCol="prediction", metricName="rmse")
     rmse = evaluator.evaluate(predictions)
 
     #creating data frame
     cSchema = StructType([StructField("date", StringType()),StructField("rmse", FloatType())])
-    rmse_list = [str(datetime.strftime(datetime.now(),'%y/%m/%d/%H/%M')), rmse]
-    rmse_df = spark.createDataFrame(rmse_list,schema=cSchema )
+    date_done = [str(datetime.strftime(datetime.now(),'%y/%m/%d/%H/%M'))]
+    rmse_data = [rmse]
+    rmse_df = spark.createDataFrame(list(zip(date_done,rmse_data)),schema=cSchema)
 
     rmse_df.write.format("org.apache.spark.sql.cassandra")\
         .mode('append')\
@@ -111,8 +113,10 @@ def main():
     #4
     predictions = testing_prediction(testingSet,waterpredictor)
     #5
-    write_to_cassandra(predictions)
+    evaluate_model(sc,predictions)
     #6
+    write_to_cassandra(predictions)
+    #7
     sc.stop()
 
 if __name__ == "__main__":

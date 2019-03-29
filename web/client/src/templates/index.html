@@ -46,11 +46,14 @@
       var labels = jsonfile.map(function(e) {
          return e.year;
       });
-      var data = jsonfile.map(function(e) {
+      var predicted_gallons = jsonfile.map(function(e) {
          return e.predicted_gallons;
       });
        var temperature = jsonfile.map(function(e){
          return e.temperature
+      });
+      var actual_gallons = jsonfile.map(function(e) {
+         return e.gallons;
       });
       
 
@@ -61,15 +64,24 @@
             labels: labels,
             datasets: [{
                label: 'Water usage prediction',
-               data: data,
-               backgroundColor: 'rgba(0, 119, 204, 0.3)',
+               data: predicted_gallons,
+               borderColor: 'rgba(0, 119, 204, 0.3)',
                fill:true
+            },
+            {
+               label: 'Actual water usage',
+               data: actual_gallons,
+               borderColor: 'rgba(140, 20, 252, 1)',
+               fill:false,
+               borderWidth: 5
             },
              {
                label:"Temperature",
                data: temperature,
-               backgroundColor: "rgba(225,0,0,0.4)",
-               fill:true}
+               borderColor: "rgba(225,0,0,0.4)",
+               fill:false,
+               borderWidth: 5
+               }
             ]
          }
       };
