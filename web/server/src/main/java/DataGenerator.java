@@ -44,6 +44,7 @@ public class DataGenerator extends Thread {
                 data.put(Headers.VV.toString() , record.get(Headers.VV));
                 data.put(Headers.U.toString() , record.get(Headers.U));
                 Thread.sleep(timeInterval);
+                System.out.println("debug: " + data);
 
             } catch (InterruptedException e)
             {
