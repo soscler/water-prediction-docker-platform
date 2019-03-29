@@ -2,6 +2,8 @@ from pyspark.sql import SparkSession
 from pyspark.ml.regression import DecisionTreeRegressor
 from pyspark.ml.feature import VectorAssembler
 from pyspark.sql.functions import *
+from pyspark.sql.types import *
+from datetime import datetime
 
 def write_to_hdfs(spark): 
     filename = "hdfs://namenode:8020/spark_ml/Weatherwater.csv"
@@ -74,6 +76,21 @@ def write_to_cassandra(predictions):
         .option("table", "testpredictions").option("keyspace", "weatherwater" )\
         .save()
     return "Cassandra Success"
+
+def evaluate_model(predicitons):
+    evaluator = RegressionEvaluator(labelCol="label", predictionCol="prediction", metricName="rmse")
+    rmse = evaluator.evaluate(predictions)
+
+    #creating data frame
+    cSchema = StructType([StructField("date", StringType()),StructField("rmse", FloatType())])
+    rmse_list = [str(datetime.strftime(datetime.now(),'%y/%m/%d/%H/%M')), rmse]
+    rmse_df = spark.createDataFrame(rmse_list,schema=cSchema )
+
+    rmse_df.write.format("org.apache.spark.sql.cassandra")\
+        .mode('append')\
+        .option("table", "rmse").option("keyspace", "weatherwater" )\
+        .save()
+    return rmse
 
 def main():
     sc = SparkSession \
