@@ -1,4 +1,4 @@
-FROM anostdev/spark-base:1.0.0-hadoop2.7
+FROM anostdev/spark-base:1.0.2-hadoop2.7
 
 #FROM bde2020/spark-python-template:2.4.0-hadoop2.7
 
@@ -10,6 +10,8 @@ COPY ./scripts/submit.sh /
 # Path to the script or zip file
 ENV SPARK_APPLICATION_PYTHON_LOCATION=water.py
 ENV CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+ENV SPARK_MASTER_NAME spark-master
+ENV SPARK_MASTER_PORT 7077
 # Argument for the program
 ENV SPARK_APPLICATION_ARGS ""
 

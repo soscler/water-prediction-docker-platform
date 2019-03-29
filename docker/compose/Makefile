@@ -46,3 +46,5 @@ clean:
 	-docker volume rm datanode namenode
 
 
+sysprune:
+	-docker system prune --volumes -f
