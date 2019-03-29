@@ -29,6 +29,13 @@ session.execute("""
             PRIMARY KEY (yyyymmdd,id)
         )
         """)              
+session.execute("""
+    CREATE TABLE IF NOT EXISTS rmse(
+        date string,
+        rmse float,
+        PRIMARY KEY(date)
+    )
+""")
 
 # session.execute("""
 #     ALTER TABLE testpredictions ADD temperature float
