@@ -24,9 +24,9 @@ else
             ${SPARK_SUBMIT_ARGS} \
             --conf spark.cassandra.connection.host=cassandra \
             --packages datastax:spark-cassandra-connector:2.4.0-s_2.11 \
-            --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.2.0 \
-            --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.1.0 \
             --repositories https://dl.bintray.com/spark-packages/maven/ \
+            --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.1.0 \
+            --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.4.0 \
             ${SPARK_APPLICATION_PYTHON_LOCATION} ${SPARK_APPLICATION_ARGS}
     else
         echo "Not recognized application."
