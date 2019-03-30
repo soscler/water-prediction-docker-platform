@@ -130,9 +130,9 @@ def main():
     #4
     #predictions = testing_prediction(testingSet,waterpredictor)
     #5
-    evaluate_model(sc,predictions)
+    #evaluate_model(sc,predictions)
     #6
-    write_to_cassandra(predictions)
+    #write_to_cassandra(predictions)
     #7
     #write_to_cassandra(predictions)
     #6
