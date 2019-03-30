@@ -17,7 +17,8 @@
 <body>
     
     <canvas id="myLineChart" height="70px" width="300px"></canvas>
-    
+    <h2>Streaming data</h2>
+    <canvas id="StreamChart" height="70px" width="300px"></canvas>
    
 <!--     
     <table>
@@ -65,7 +66,7 @@
             datasets: [{
                label: 'Water usage prediction',
                data: predicted_gallons,
-               borderColor: 'rgba(0, 119, 204, 0.3)',
+               backgroundColor: 'rgba(0, 119, 204, 0.3)',
                fill:true
             },
             {
@@ -73,14 +74,14 @@
                data: actual_gallons,
                borderColor: 'rgba(140, 20, 252, 1)',
                fill:false,
-               borderWidth: 5
-            },
+               pointRadius:2
+               },
              {
                label:"Temperature",
                data: temperature,
                borderColor: "rgba(225,0,0,0.4)",
                fill:false,
-               borderWidth: 5
+               pointRadius:2
                }
             ]
          }

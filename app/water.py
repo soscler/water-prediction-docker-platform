@@ -123,9 +123,9 @@ def main():
     #4
     #predictions = testing_prediction(testingSet,waterpredictor)
     #5
-    evaluate_model(sc,predictions)
+    # evaluate_model(sc,predictions)
     #6
-    write_to_cassandra(predictions)
+    # write_to_cassandra(predictions)
     #7
     #write_to_cassandra(predictions)
     #6
@@ -133,35 +133,35 @@ def main():
     # -- Kafka consumer
 
     print("*************************************************************************************************************")
-    kafkareader = sc \
-        .readStream \
-        .format("kafka") \
-        .option("kafka.bootstrap.servers", "kafka:29092") \
-        .option("subscribe", "topic1") \
-        .option("startingOffsets", "earliest") \
-        .load()
+    # kafkareader = sc \
+    #     .readStream \
+    #     .format("kafka") \
+    #     .option("kafka.bootstrap.servers", "kafka:29092") \
+    #     .option("subscribe", "topic1") \
+    #     .option("startingOffsets", "earliest") \
+    #     .load()
     # stream = kafkareader.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
     # stream.writeStream.format("console").start()
 
 
-    rawQuery = kafkareader \
-        .writeStream \
-        .queryName("qraw")\
-        .format("memory")\
-        .start()
-    raw = sc.sql("select * from qraw")
-    raw.show()
+    # rawQuery = kafkareader \
+    #     .writeStream \
+    #     .queryName("qraw")\
+    #     .format("memory")\
+    #     .start()
+    # raw = sc.sql("select * from qraw")
+    # raw.show()
+    sparkC = sc.sparkContext
+    ssc = StreamingContext(sparkContext=sparkC, batchDuration=1)
 
-    # ssc = StreamingContext(sparkContext=sc, batchDuration=1)
+    streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
+    lines = streams.map(lambda x: x[1])
+    lines.pprint()
+    #print(streams)
 
-    # streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
-    # lines = streams.map(lambda x: x[1])
-    # lines.pprint()
-    # #print(streams)
-
-    # ssc.start()
-    # ssc.awaitTermination()
-    sc.stop()
+    ssc.start()
+    ssc.awaitTermination()
+    # sc.stop()
 
 if __name__ == "__main__":
     main()
