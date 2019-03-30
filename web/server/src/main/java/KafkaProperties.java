@@ -17,8 +17,8 @@
 
 public class KafkaProperties {
     public static final String TOPIC = "topic1";
-    public static final String KAFKA_SERVER_URL = "localhost";
-    public static final int KAFKA_SERVER_PORT = 9092;
+    public static final String KAFKA_SERVER_URL = "kafka";
+    public static final int KAFKA_SERVER_PORT = 29092;
     public static final long CSV_READER_TIMER = 1000;
     public static final String CSV_FILE_NAME = "data.csv";
     public static final String URL = "https://raw.githubusercontent.com/Jarvin-M/Coding-Practice/master/Weatherwater.csv";
