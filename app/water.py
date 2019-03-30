@@ -96,20 +96,27 @@ def evaluate_model(predicitons):
         .save()
     return rmse
 
+def consume_streaming(context):
+    
+    ssc = StreamingContext(sparkContext=context, batchDuration=1)
+
+    streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
+    lines = streams.map(lambda x: x[1])
+    lines.pprint()
+
+    ssc.start()
+    ssc.awaitTermination()
+
+
 def main():
-    # config = SparkConf()\
-    #     .setMaster("spark://spark-master:7077") \
-    #     .set("spark.cassandra.connection.host", "cassandra") \
-    #     .set("spark.executor.memory", "2000m")
-    # sc = SparkContext(appName="WeatherwaterKafkaConsumer", master="spark://spark-master:7077", conf=config) \
-    #     .getOrCreate()
-    sc = SparkSession \
+    spark = SparkSession \
         .builder \
         .master("spark://spark-master:7077") \
         .config("spark.cassandra.connection.host", "cassandra") \
         .config("spark.executor.memory", "2000m")\
         .appName("Weather prediction") \
         .getOrCreate()
+    
     #1   
     #write_to_hdfs(sc)
     #2
@@ -127,35 +134,9 @@ def main():
     # -- Kafka consumer
 
     print("*************************************************************************************************************")
-    kafkareader = sc \
-        .readStream \
-        .format("kafka") \
-        .option("kafka.bootstrap.servers", "kafka:29092") \
-        .option("subscribe", "topic1") \
-        .option("startingOffsets", "earliest") \
-        .load()
-    # stream = kafkareader.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-    # stream.writeStream.format("console").start()
-
-
-    rawQuery = kafkareader \
-        .writeStream \
-        .queryName("qraw")\
-        .format("memory")\
-        .start()
-    raw = sc.sql("select * from qraw")
-    raw.show()
-
-    # ssc = StreamingContext(sparkContext=sc, batchDuration=1)
-
-    # streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
-    # lines = streams.map(lambda x: x[1])
-    # lines.pprint()
-    # #print(streams)
-
-    # ssc.start()
-    # ssc.awaitTermination()
-    sc.stop()
+    sc = spark.sparkContext
+    consume_streaming(sc)
+    
 
 if __name__ == "__main__":
     main()
