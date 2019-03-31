@@ -7,6 +7,8 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
+from pyspark.sql import SQLContext, Row
+import json
 from datetime import datetime
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
