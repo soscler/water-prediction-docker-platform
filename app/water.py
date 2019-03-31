@@ -6,6 +6,8 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
+from pyspark.sql import SQLContext, Row
+import json
 from datetime import datetime
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
@@ -98,16 +100,51 @@ def evaluate_model(spark,predictions):
         .save()
     return rmse
 
-def consume_streaming(context):
+# def consume_streaming(context):
     
-    ssc = StreamingContext(sparkContext=context, batchDuration=1)
+#     ssc = StreamingContext(sparkContext=context, batchDuration=1)
 
-    streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
-    lines = streams.map(lambda x: x[1])
-    lines.pprint()
+#     streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
+#     lines = streams.map(lambda x: x[1])
+#     lines.pprint()
 
+#     ssc.start()
+#     ssc.awaitTermination()
+
+def consume_streaming(context,session):
+    
+    ssc = StreamingContext(sparkContext=context, batchDuration=2)
+
+    streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'},\
+    keyDecoder=lambda x: x, valueDecoder=lambda x: x)
+    rows = streams.map(lambda x: Row(json.loads(x[1])))
+    rows.foreachRDD(lambda rdd: processRDD(rdd,context))
+    # gh =lines
+    # listRDD = context.parallelize(lines)
+    # df = session.read.json(lines)
+    # df.show()
+    # lines["HH"].pprint()
+    # streams.cache()
+    # print(lines)
+    # # println(result.size + " size")
+    # streams.foreachRDD(lambda rdd: session.read.json(rdd).show())
     ssc.start()
     ssc.awaitTermination()
+
+def processRDD(rdd,context):
+    sqlContext = SQLContext(context)
+    df = sqlContext.createDataFrame(rdd)
+    processedDf = df.select(df.HH.cast('int').alias("HH"),\
+                df.DD.cast('float').alias("DD"),\
+                df.P.cast('float').alias("P"),\
+                df.VV.cast('float').alias("VV"),\
+                df.FH.cast('float').alias("FH"),\
+                df.T.cast('float').alias("T"), \
+                df.U.cast('float').alias("U"),\
+                df.ID.cast('int').alias("ID"),\
+                df.YYYYMMDD.cast(TimestampType()).alias("YYYYMMDD"),\
+                df.SQ.cast('float').alias("SQ"))
+    processedDf.show()
 
 
 def main():
@@ -141,7 +178,7 @@ def main():
 
     print("*************************************************************************************************************")
     sc = spark.sparkContext
-    consume_streaming(sc)
+    consume_streaming(sc, spark)
     
 
 if __name__ == "__main__":
