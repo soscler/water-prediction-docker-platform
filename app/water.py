@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark import SparkContext
 from pyspark import SparkConf
+from pyspark.sql import SQLContext, Row
 from pyspark.ml.regression import DecisionTreeRegressor
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.evaluation import RegressionEvaluator
@@ -9,6 +10,7 @@ from pyspark.sql.types import *
 from datetime import datetime
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
+import json
 
 def write_to_hdfs(spark): 
     filename = "hdfs://namenode:8020/spark_ml/Weatherwater2.csv"
@@ -98,50 +100,62 @@ def evaluate_model(spark,predictions):
         .save()
     return rmse
 
-def consume_streaming(context):
+def consume_streaming(context,session):
     
-    ssc = StreamingContext(sparkContext=context, batchDuration=1)
+    ssc = StreamingContext(sparkContext=context, batchDuration=2)
 
-    streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'})
-    lines = streams.map(lambda x: x[1])
-    lines.pprint()
-
+    streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'},keyDecoder=lambda x: x, valueDecoder=lambda x: x)
+    rows = streams.map(lambda x: json.loads(x[1]))
+    # rows.pprint()
+    # rows.cache()
+    def process(rdd):
+        sqlc = SQLContext(context)
+        df = sqlc.createDataFrame(rdd)
+        processdf = df.select(df["HH"].cast(IntegerType()).alias("HH"),\
+                df["DD"].cast(FloatType()).alias("DD"),\
+                df["P"].cast(FloatType()).alias("P"),\
+                df["VV"].cast(FloatType()).alias("VV"),\
+                df["FH"].cast(FloatType()).alias("FH"),\
+                df["T"].cast(FloatType()).alias("T"),\
+                df["U"].cast(FloatType()).alias("U"),\
+                df["ID"].cast(IntegerType()).alias("HH"),\
+                df["YYYYMMDD"].cast(TimestampType()).alias("YYYYMMDD"),\
+                df["SQ"].cast(FloatType()).alias("SQ"))
+        processdf.printSchema()
+    
+    rows.foreachRDD(process)
     ssc.start()
     ssc.awaitTermination()
 
-
 def main():
-    spark = SparkSession \
-        .builder \
-        .master("spark://spark-master:7077") \
-        .config("spark.cassandra.connection.host", "cassandra") \
+    spark = SparkSession\
+        .builder\
+        .master("spark://spark-master:7077")\
+        .config("spark.cassandra.connection.host", "cassandra")\
         .config("spark.executor.memory", "2000m")\
-        .appName("Weather prediction") \
+        .appName("Weather prediction")\
         .getOrCreate()
     
     #1   
-    #write_to_hdfs(sc)
+    write_to_hdfs(sc)
     #2
-    #trainingSet, testingSet = data_process(sc)
+    trainingSet, testingSet = data_process(sc)
     #3
-    #waterpredictor = model_regressor(trainingSet)
+    waterpredictor = model_regressor(trainingSet)
     
-    # waterpredictor = sc.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
+    waterpredictor = sc.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
     #4
-    #predictions = testing_prediction(testingSet,waterpredictor)
+    predictions = testing_prediction(testingSet,waterpredictor)
     #5
-    # evaluate_model(sc,predictions)
+    evaluate_model(sc,predictions)
     #6
-    # write_to_cassandra(predictions)
-    #7
-    #write_to_cassandra(predictions)
-    #6
-
+    write_to_cassandra(predictions)
+    
     # -- Kafka consumer
 
     print("*************************************************************************************************************")
     sc = spark.sparkContext
-    consume_streaming(sc)
+    consume_streaming(sc,spark)
     
 
 if __name__ == "__main__":
