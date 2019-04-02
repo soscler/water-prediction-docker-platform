@@ -138,20 +138,20 @@ def main():
         .appName("Weather prediction")\
         .getOrCreate()
     
-    #1   
-    write_to_hdfs(sc)
-    #2
-    trainingSet, testingSet = data_process(sc)
-    #3
-    waterpredictor = model_regressor(trainingSet)
+    # #1   
+    # write_to_hdfs(sc)
+    # #2
+    # trainingSet, testingSet = data_process(sc)
+    # #3
+    # waterpredictor = model_regressor(trainingSet)
     
-    waterpredictor = sc.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
-    #4
-    predictions = testing_prediction(testingSet,waterpredictor)
-    #5
-    evaluate_model(sc,predictions)
-    #6
-    write_to_cassandra(predictions)
+    # waterpredictor = sc.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
+    # #4
+    # predictions = testing_prediction(testingSet,waterpredictor)
+    # #5
+    # evaluate_model(sc,predictions)
+    # #6
+    # write_to_cassandra(predictions)
     
     # -- Kafka consumer
 
