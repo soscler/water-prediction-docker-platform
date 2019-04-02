@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export DATA_FOLDER_NAME=/spark_ml
-export DATA_FILE_NAME=Weather
+export DATA_FILE_NAME=Weatherwater.csv
 DATA_URL=https://raw.githubusercontent.com/Jarvin-M/Coding-Practice/master/batchData.csv
 
 mkdir -p ${DATA_FOLDER_NAME}

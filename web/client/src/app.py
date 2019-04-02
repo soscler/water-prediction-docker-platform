@@ -43,7 +43,6 @@ session.execute("""
             yyyymmdd timestamp,
             hh bigint,
             temperature float,
-            gallons float,
             prediction float,
             PRIMARY KEY (yyyymmdd,id)
         )
@@ -69,23 +68,21 @@ def post_to_front():
             'gallons':row.gallons
         }
         pulled.append(each_row)
-    # msg=jsonify({'result': pulled})
-    return render_template("index.html",msg=pulled)
 
-def streaming():
-    rows = session.execute('SELECT id,yyyymmdd,MAX(prediction) as prediction,hh,temperature FROM streaming GROUP BY yyyymmdd;')
+    streams = session.execute('SELECT id,yyyymmdd,MAX(prediction) as prediction,hh,temperature FROM streaming GROUP BY yyyymmdd;')
     streamed =[]
-    for row in rows:
+    for row in streams:
         print(row)
-        each_row ={
+        stream_row ={
             'id':row.id,
             'Time':row.hh,
             'year':row.yyyymmdd.strftime("%m/%d/%Y"),
             'predicted_gallons':row.prediction,
             "temperature": row.temperature
         }
-        streamed.append(each_row)
-    return render_template("index.html",stream_msg=streamed)
+        streamed.append(stream_row)
+        
+    return render_template("index.html",stream_msg=streamed, msg=pulled)
 
 if __name__ == '__main__':
     app.run(debug=False, host="0.0.0.0", port=int("5000"))

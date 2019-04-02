@@ -17,29 +17,16 @@
 <body>
     
     <canvas id="myLineChart" height="70px" width="300px"></canvas>
-    <h2>Streaming data</h2>
+    <h2 style="text-align: center">Streaming data</h2>
     <canvas id="StreamChart" height="70px" width="300px"></canvas>
    
-<!--     
-    <table>
-            <tr>
-                    <th>Year</th>
-                    <th>Hour</th>
-                    <th>Gallons</th>
-                    <th>Predictions</th>
-            </tr>
-        {% for row in msg %}               
-            <tr>
-                <td> {{ row.year }} </td>
-                <td> {{ row.Time }} </td>
-                <td> {{ row.Gallons }} </td>
-                <td> {{ row.predicted_gallons }} </td>
-            </tr>
-         {% endfor %}
-    </table> -->
+
 </body>
    <script>
-      var rawfile = '{{ stream_msg }}';
+      setTimeout(function(){
+         location.reload();
+      },10000);
+      var rawfile = '{{ msg }}';
       var jsonfile = JSON.parse(rawfile.replace(/&#39;/g,'"'))
       jsonfile.sort((a, b) => Number(a.id) - Number(b.id));
       console.log(jsonfile);
@@ -88,5 +75,48 @@
       };
 
       var chart = new Chart(ctx, config);
+
+      //------------------------------------Streaming-----------------------------------
+      var rawfile2 = '{{ stream_msg }}';
+      var jsonfile = JSON.parse(rawfile2.replace(/&#39;/g,'"'))
+      jsonfile.sort((a, b) => Number(a.id) - Number(b.id));
+
+      var labels2 = jsonfile.map(function(e) {
+         return e.year;
+      });
+      var predicted_gallons2 = jsonfile.map(function(e) {
+         return e.predicted_gallons;
+      });
+       var temperature2 = jsonfile.map(function(e){
+         return e.temperature
+      });
+      var actual_gallons2 = jsonfile.map(function(e) {
+         return e.gallons;
+      });
+      
+
+      var ctx2 = StreamChart.getContext('2d');
+      var config2 = {
+         type: 'line',
+         data: {
+            labels: labels2,
+            datasets: [{
+               label: 'Water usage prediction',
+               data: predicted_gallons2,
+               backgroundColor: 'rgba(0, 119, 204, 0.3)',
+               fill:true
+            },
+            {
+               label:"Temperature",
+               data: temperature2,
+               borderColor: "rgba(225,0,0,0.4)",
+               fill:false,
+               pointRadius:2
+               }
+            ]
+         }
+      };
+
+      var chart = new Chart(ctx2, config2);
    </script>
 </html>

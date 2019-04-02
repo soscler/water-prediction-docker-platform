@@ -15,7 +15,7 @@ from pyspark.streaming.kafka import KafkaUtils
 import json
 
 def write_to_hdfs(spark): 
-    filename = "hdfs://namenode:8020/spark_ml/Weatherwater2.csv"
+    filename = "hdfs://namenode:8020/spark_ml/Weatherwater.csv"
     rawdata = spark.read.load(filename, format="csv", sep=",", inferSchema="true", header="true")
     rawdata.write.mode('overwrite').orc("hdfs://namenode:8020/spark_ml/Weather")
 
@@ -61,18 +61,27 @@ def model_regressor(trainingSet):
     return model
 
 
-def testing_prediction(testSet, model):
+def testing_prediction(testSet, model,isBatch=False):
     #transforming the testset
     testingData = feature_assembler().transform(testSet)
     predictions = model.transform(testingData).select("ID","YYYYMMDD", "HH","prediction")
-
-    predicition_df = testSet.select("ID","YYYYMMDD", "HH", "Gallons","T").join(predictions, testSet.ID == predictions.ID, 'inner') \
+    
+    if(isBatch):
+        predicition_df = testSet.select("ID","YYYYMMDD", "HH", "Gallons","T").join(predictions, testSet.ID == predictions.ID, 'inner') \
+                        .drop(predictions.YYYYMMDD).drop(predictions.ID).drop(predictions.HH)\
+                        .withColumnRenamed("ID","id")\
+                        .withColumnRenamed("YYYYMMDD","yyyymmdd")\
+                        .withColumnRenamed("HH", "hh")\
+                        .withColumnRenamed("T", "temperature")\
+                        .withColumnRenamed("Gallons","gallons")\
+                        .sort(asc('ID'))
+    else:
+        predicition_df = testSet.select("ID","YYYYMMDD", "HH","T").join(predictions, testSet.ID == predictions.ID, 'inner') \
                     .drop(predictions.YYYYMMDD).drop(predictions.ID).drop(predictions.HH)\
                     .withColumnRenamed("ID","id")\
                     .withColumnRenamed("YYYYMMDD","yyyymmdd")\
                     .withColumnRenamed("HH", "hh")\
                     .withColumnRenamed("T", "temperature")\
-                    .withColumnRenamed("Gallons","gallons")\
                     .sort(asc('ID'))
     return predicition_df
 
@@ -112,41 +121,49 @@ def evaluate_model(spark,predictions):
         .save()
     return rmse
 
-def load_model(context):
-     waterpredictor = context.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
+def load_model(spark):
+     waterpredictor = spark.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
      return waterpredictor
 
-def consume_streaming(context,session):
+def consume_streaming(context,session,model):
     """"
     Consumes the data from the producer
     """
-    
     ssc = StreamingContext(sparkContext=context, batchDuration=2)
 
     streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'},keyDecoder=lambda x: x, valueDecoder=lambda x: x)
     rows = streams.map(lambda x: json.loads(x[1]))
+
     def process(rdd):
+        
         """
         Nested function that processes each RDD from the data stream
+        TODO: if rdd.isEmpty() do nothing, else to stuff
         """
         sqlc = SQLContext(context)
-        df = sqlc.createDataFrame(rdd)
-        processed_df = df.select(df["HH"].cast(IntegerType()).alias("HH"),\
-                df["DD"].cast(FloatType()).alias("DD"),\
-                df["P"].cast(FloatType()).alias("P"),\
-                df["VV"].cast(FloatType()).alias("VV"),\
-                df["FH"].cast(FloatType()).alias("FH"),\
-                df["T"].cast(FloatType()).alias("T"),\
-                df["U"].cast(FloatType()).alias("U"),\
-                df["ID"].cast(IntegerType()).alias("HH"),\
-                df["YYYYMMDD"].cast(TimestampType()).alias("YYYYMMDD"),\
-                df["SQ"].cast(FloatType()).alias("SQ"))
 
-        predictor = load_model(context)
-        streaming_predicition = testing_prediction(processed_df,predictor)
-        write_streaming_to_cassandra(streaming_predicition)
-    
-    rows.foreachRDD(process)
+        if not rdd.isEmpty():
+            df = sqlc.createDataFrame(rdd)
+            processed_df = df.select(df["HH"].cast(IntegerType()).alias("HH"),\
+                    df["DD"].cast(FloatType()).alias("DD"),\
+                    df["P"].cast(FloatType()).alias("P"),\
+                    df["VV"].cast(FloatType()).alias("VV"),\
+                    df["FH"].cast(FloatType()).alias("FH"),\
+                    df["T"].cast(FloatType()).alias("T"),\
+                    df["U"].cast(FloatType()).alias("U"),\
+                    df["ID"].cast(IntegerType()).alias("ID"),\
+                    df["YYYYMMDD"].cast(TimestampType()).alias("YYYYMMDD"),\
+                    df["SQ"].cast(FloatType()).alias("SQ"))
+            #processed_df.show()
+            streaming_prediction = testing_prediction(processed_df,model, isBatch=False)
+            streaming_prediction.show()
+            write_streaming_to_cassandra(streaming_prediction)
+
+    try:
+        rows.foreachRDD(process)
+    except:
+        print("-------------------------------------------------------------------------------------------------")
+        pass
     ssc.start()
     ssc.awaitTermination()
 
@@ -160,15 +177,15 @@ def main():
         .getOrCreate()
     
     #1   
-    write_to_hdfs(sc)
+    write_to_hdfs(spark)
     #2
-    trainingSet, testingSet = data_process(sc)
+    trainingSet, testingSet = data_process(spark)
     #3
     waterpredictor = model_regressor(trainingSet)
     #4
-    predictions = testing_prediction(testingSet,waterpredictor)
+    predictions = testing_prediction(testingSet,waterpredictor, isBatch=True)
     #5
-    evaluate_model(sc,predictions)
+    evaluate_model(spark,predictions)
     #6
     write_to_cassandra(predictions)
     
@@ -176,7 +193,7 @@ def main():
 
     print("*************************************************************************************************************")
     sc = spark.sparkContext
-    consume_streaming(sc,spark)
+    consume_streaming(sc,spark,waterpredictor)
     
 
 if __name__ == "__main__":

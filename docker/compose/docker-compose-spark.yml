@@ -15,8 +15,8 @@ services:
       - ./hadoop.env
     networks: 
       - scac-network-2019
-    volumes:
-      - data:/tmp/data
+    # volumes:
+    #   - data:/tmp/data
 
 
   spark-worker:
@@ -34,8 +34,8 @@ services:
       - ./hadoop.env
     networks: 
       - scac-network-2019
-    volumes:
-      - data:/tmp/data
+    # volumes:
+    #   - data:/tmp/data
   
   spark-worker-2:
     image: anostdev/spark-worker:1.0.2-hadoop2.7
@@ -52,11 +52,11 @@ services:
       - 8082:8081
     env_file:
       - ./hadoop.env
-    volumes:
-      - data:/tmp/data
+    # volumes:
+    #   - data:/tmp/data
 
-volumes: 
-  data:
+# volumes: 
+#   data:
 
 networks:
   scac-network-2019:
