@@ -86,6 +86,16 @@ def write_to_cassandra(predictions):
         .save()
     return "Cassandra Success"
 
+def write_streaming_to_cassandra(predictions):
+    """"
+    Using the cassandra connector package to write the predictions dataframe to the cassandra container
+    """
+    predictions.write.format("org.apache.spark.sql.cassandra")\
+        .mode('append')\
+        .option("table", "streaming").option("keyspace", "weatherwater" )\
+        .save()
+    return "***********************************************Cassandra Success*********************************************************"
+
 def evaluate_model(spark,predictions):
     evaluator = RegressionEvaluator(labelCol="gallons", predictionCol="prediction", metricName="rmse")
     rmse = evaluator.evaluate(predictions)
@@ -102,18 +112,26 @@ def evaluate_model(spark,predictions):
         .save()
     return rmse
 
+def load_model(context):
+     waterpredictor = context.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
+     return waterpredictor
+
 def consume_streaming(context,session):
+    """"
+    Consumes the data from the producer
+    """
     
     ssc = StreamingContext(sparkContext=context, batchDuration=2)
 
     streams = KafkaUtils.createDirectStream(ssc, topics=['topic1'], kafkaParams={"metadata.broker.list": 'kafka:29092'},keyDecoder=lambda x: x, valueDecoder=lambda x: x)
     rows = streams.map(lambda x: json.loads(x[1]))
-    # rows.pprint()
-    # rows.cache()
     def process(rdd):
+        """
+        Nested function that processes each RDD from the data stream
+        """
         sqlc = SQLContext(context)
         df = sqlc.createDataFrame(rdd)
-        processdf = df.select(df["HH"].cast(IntegerType()).alias("HH"),\
+        processed_df = df.select(df["HH"].cast(IntegerType()).alias("HH"),\
                 df["DD"].cast(FloatType()).alias("DD"),\
                 df["P"].cast(FloatType()).alias("P"),\
                 df["VV"].cast(FloatType()).alias("VV"),\
@@ -123,7 +141,10 @@ def consume_streaming(context,session):
                 df["ID"].cast(IntegerType()).alias("HH"),\
                 df["YYYYMMDD"].cast(TimestampType()).alias("YYYYMMDD"),\
                 df["SQ"].cast(FloatType()).alias("SQ"))
-        processdf.printSchema()
+
+        predictor = load_model(context)
+        streaming_predicition = testing_prediction(processed_df,predictor)
+        write_streaming_to_cassandra(streaming_predicition)
     
     rows.foreachRDD(process)
     ssc.start()
@@ -138,20 +159,18 @@ def main():
         .appName("Weather prediction")\
         .getOrCreate()
     
-    # #1   
-    # write_to_hdfs(sc)
-    # #2
-    # trainingSet, testingSet = data_process(sc)
-    # #3
-    # waterpredictor = model_regressor(trainingSet)
-    
-    # waterpredictor = sc.read.load("hdfs://namenode:8020/spark_ml/Waterpredictor.mml")
-    # #4
-    # predictions = testing_prediction(testingSet,waterpredictor)
-    # #5
-    # evaluate_model(sc,predictions)
-    # #6
-    # write_to_cassandra(predictions)
+    #1   
+    write_to_hdfs(sc)
+    #2
+    trainingSet, testingSet = data_process(sc)
+    #3
+    waterpredictor = model_regressor(trainingSet)
+    #4
+    predictions = testing_prediction(testingSet,waterpredictor)
+    #5
+    evaluate_model(sc,predictions)
+    #6
+    write_to_cassandra(predictions)
     
     # -- Kafka consumer
 

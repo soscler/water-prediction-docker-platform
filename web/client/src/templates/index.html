@@ -39,7 +39,7 @@
     </table> -->
 </body>
    <script>
-      var rawfile = '{{ msg }}';
+      var rawfile = '{{ stream_msg }}';
       var jsonfile = JSON.parse(rawfile.replace(/&#39;/g,'"'))
       jsonfile.sort((a, b) => Number(a.id) - Number(b.id));
       console.log(jsonfile);
