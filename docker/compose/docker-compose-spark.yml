@@ -3,42 +3,60 @@ version: '3.5'
 services:
 
   spark-master:
-    image: anostdev/spark-master:1.0.0-hadoop2.7.7
+    image: anostdev/spark-master:1.0.2-hadoop2.7
     container_name: spark-master
     ports:
       - 8080:8080
       - 7077:7077
+      - 4040:4040
+      - 8001:8080
+      - 8888:8888
     env_file:
       - ./hadoop.env
     networks: 
       - scac-network-2019
+    # volumes:
+    #   - data:/tmp/data
 
 
   spark-worker:
-    image:  anostdev/spark-worker:1.0.0-hadoop2.7
+    image: anostdev/spark-worker:1.0.2-hadoop2.7
     depends_on:
       - spark-master
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_PORT: 8881
+      SPARK_WORKER_WEBUI_PORT: 8081
+      SPARK_PUBLIC_DNS: localhost
     ports:
-      - 8081:8080
+      - 8081:8081
     env_file:
       - ./hadoop.env
     networks: 
       - scac-network-2019
+    # volumes:
+    #   - data:/tmp/data
   
   spark-worker-2:
-    image: anostdev/spark-worker:1.0.0-hadoop2.7
+    image: anostdev/spark-worker:1.0.2-hadoop2.7
     depends_on:
       - spark-master
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_PORT: 8881
+      SPARK_WORKER_WEBUI_PORT: 8081
+      SPARK_PUBLIC_DNS: localhost
     networks: 
       - scac-network-2019
     ports:
-      - 8082:8080
+      - 8082:8081
     env_file:
       - ./hadoop.env
+    # volumes:
+    #   - data:/tmp/data
+
+# volumes: 
+#   data:
 
 networks:
   scac-network-2019:

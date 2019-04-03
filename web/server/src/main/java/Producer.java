@@ -76,7 +76,7 @@ public class Producer extends Thread {
             }
             ++messageNo;
             try {
-                Thread.sleep(2000);
+                Thread.sleep(KafkaProperties.CSV_READER_TIMER);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
